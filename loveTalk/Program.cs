@@ -19,7 +19,7 @@ namespace loveTalk
 
             var wtf = BTManager.getDevices();
             Console.WriteLine(wtf[0].Name);
-            var w = new lovetalkToy(wtf[0]);
+            var w = new loveToy(wtf[0]);
             w.connect().Wait();
             w.setVibration(0.1f);
             

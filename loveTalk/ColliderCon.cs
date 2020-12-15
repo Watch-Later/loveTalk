@@ -61,5 +61,6 @@ namespace loveTalk
         public string name;
         public Vector3 position;
         public float radius;
+        public bool any = false; 
     }
 }

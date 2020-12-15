@@ -48,8 +48,8 @@
   <ItemGroup>
     <Compile Include="BTManager.cs" />
     <Compile Include="ColliderCon.cs" />
-    <Compile Include="lovetalkToy.cs" />
     <Compile Include="loveToy.cs" />
+    <Compile Include="loveToyController.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

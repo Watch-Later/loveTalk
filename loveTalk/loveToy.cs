@@ -17,14 +17,14 @@ namespace loveTalk
        CONNECTING = 1 << 2,
        DISCONNECT = 1 << 3
     }
-    public class lovetalkToy
+    public class loveToy
     {
         public BluetoothDevice btDevice;
         public GattService btSevice;
         public string Model = "UNKNOWN";
         public string AdvancedStatus = "Not a damn thing";
-        public loveToyStatus Status; 
-
+        public loveToyStatus Status;
+        public loveToyController Controller;
 
         private GattCharacteristic btTxChr;
         private GattCharacteristic btRxChr;
@@ -58,7 +58,7 @@ namespace loveTalk
         };
 
 
-        public lovetalkToy(BluetoothDevice dev)
+        public loveToy(BluetoothDevice dev)
         {
             btDevice = dev; 
         }
