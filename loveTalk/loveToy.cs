@@ -126,6 +126,8 @@ namespace loveTalk
             return true;
         }
 
+ 
+
         public void sendCommandNoResponse(string command)
         {
             Console.WriteLine(command);
@@ -138,6 +140,7 @@ namespace loveTalk
             var packet = Encoding.ASCII.GetBytes(command);
             await btRxChr.StartNotificationsAsync(); // Subscribe to BTCHAR notifications
             await btTxChr.WriteValueWithResponseAsync(packet);
+            // xayrga.bop.lengthEncapsulateArray(packet)
             return Encoding.ASCII.GetString(btRxChr.Value);
         }
 

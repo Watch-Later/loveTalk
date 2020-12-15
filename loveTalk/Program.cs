@@ -12,18 +12,17 @@ namespace loveTalk
         public static Lua LuaState;
         public static LuaFunction callHook;
 
+        public static loveToy[] Toys = new loveToy[8];
+
         static void Main(string[] args)
         {
+            Console.Write("Waiting for ColliderCon interface...");
+            while (!ColliderCon.connect())
+            {
+                System.Threading.Thread.Sleep(500); 
+            }
+            Console.WriteLine("Gotcha!");
 
-            ColliderCon.connect();
-
-            var wtf = BTManager.getDevices();
-            Console.WriteLine(wtf[0].Name);
-            var w = new loveToy(wtf[0]);
-            w.connect().Wait();
-            w.setVibration(0.1f);
-            
-            /*
             LuaState = new Lua();
             LuaState.LoadCLRPackage(); // Initialize CLR for lua state 
             //LStateLibaries.File.Setup(LuaState);
@@ -32,7 +31,27 @@ namespace loveTalk
             LuaState.DoString("import('loveTalk','loveTalk')"); // Import lovetalk namespace
             LuaState.DoString("dofile('lovetalk/init.lua')");
             callHook = (LuaFunction)LuaState["modhook.Call"];
-            */
+            Console.WriteLine("Lua OK!");
+
+            Console.Write("Initializing 3D device...");
+            GuiController.init();
+            Console.WriteLine("OK");
+
+
+            while (true)
+            {
+                var colliders = ColliderCon.getColliders();
+
+                for (int i=0; i < Toys.Length; i++)
+                {
+                    var toy = Toys[i];
+                    if (toy != null && toy.Controller != null)
+                        toy.Controller.update(colliders, toy);
+                }
+                GuiController.update();
+            }
+
+
             Console.ReadLine();
         }
     }

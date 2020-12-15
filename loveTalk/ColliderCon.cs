@@ -41,7 +41,7 @@ namespace loveTalk
             bReader.ReadInt32(); // Skip first 4 bytes (C# pointer weird stuff.)
             var count = bReader.ReadInt32();
             var colData = new ColliderData[count];
-            bReader.ReadByte(); // Skip next 4 bytes, padded the int32 to be safe
+            bReader.ReadByte(); // single byte padding
             for (int i = 0; i < count; i++)
             {
                 var nColl = new ColliderData();
@@ -53,8 +53,15 @@ namespace loveTalk
             }
            return colData;
         }
-    }
 
+        public static ColliderData matchName(ColliderData[] coll, string name)
+        {
+            for (int i=0; i < coll.Length; i++)            
+                if (coll[i].name == name)
+                    return coll[i];
+            return null;            
+        }
+    }
 
     public class ColliderData
     {
@@ -63,4 +70,5 @@ namespace loveTalk
         public float radius;
         public bool any = false; 
     }
+
 }
