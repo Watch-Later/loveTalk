@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+
 using NLua;
 
 namespace loveTalk
@@ -11,8 +15,32 @@ namespace loveTalk
     {
         public static Lua LuaState;
         public static LuaFunction callHook;
+        public static ColliderData[] colliders; 
 
         public static loveToy[] Toys = new loveToy[8];
+        public static Dictionary<string, loveToyController> controllers = new Dictionary<string, loveToyController>();
+
+
+        private static void loadControllers()
+        {
+            var files = Directory.GetFiles("lovetalk/controllers","*.lua");
+            for (int i=0; i < files.Length; i++)
+            {
+                LuaState.DoString("CTRL = {}");
+                LuaState.DoFile(files[i]);
+                var CTable = (LuaTable)LuaState["CTRL"];
+                var data = loveToyController.fromLuaTable(CTable);
+                controllers[data.Name] = data; 
+            }
+        }
+
+
+        public class CallYourTherapistException : Exception
+        {
+
+        }
+
+
 
         static void Main(string[] args)
         {
@@ -31,28 +59,36 @@ namespace loveTalk
             LuaState.DoString("import('loveTalk','loveTalk')"); // Import lovetalk namespace
             LuaState.DoString("dofile('lovetalk/init.lua')");
             callHook = (LuaFunction)LuaState["modhook.Call"];
-            Console.WriteLine("Lua OK!");
+            loadControllers();
+            Debug.WriteLine("Lua OK!");
 
-            Console.Write("Initializing 3D device...");
+
+            Debug.Write("Initializing 3D device...");
             GuiController.init();
-            Console.WriteLine("OK");
+            Debug.WriteLine("OK");
 
-
+            var fc = 0;
             while (true)
             {
-                var colliders = ColliderCon.getColliders();
-
-                for (int i=0; i < Toys.Length; i++)
+                fc++;
+                if (fc > 3)
                 {
-                    var toy = Toys[i];
-                    if (toy != null && toy.Controller != null)
-                        toy.Controller.update(colliders, toy);
+                    colliders = ColliderCon.getColliders();
+
+                    for (int i = 0; i < Toys.Length; i++)
+                    {
+                        var toy = Toys[i];
+                        if (toy != null && toy.Controller != null)
+                            toy.Controller.update(colliders, toy);
+                    }
+                    fc = 0;
                 }
+
                 GuiController.update();
             }
 
 
-            Console.ReadLine();
+  
         }
     }
 }

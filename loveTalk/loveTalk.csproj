@@ -77,11 +77,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="lovetalk\init.lua">
+    <None Include="lovetalk\controllers\test.lua">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="lovetalk\init.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="lovetalk\preinit.lua">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <EmbeddedResource Include="Shaders\GLSL\imgui-frag.glsl" />
     <EmbeddedResource Include="Shaders\GLSL\imgui-vertex.glsl" />

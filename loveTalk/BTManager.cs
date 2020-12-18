@@ -15,9 +15,9 @@ namespace loveTalk
     public static class BTManager
     {
         public static BluetoothDevice[] pairedDevices;
-        public static BluetoothDevice[] getDevices()
-        {           
-            var cl1 = Bluetooth.GetPairedDevicesAsync().Result;
+        public static async Task<BluetoothDevice[]> getDevices()
+        {
+            var cl1 = await Bluetooth.GetPairedDevicesAsync();
             return cl1.ToArray<BluetoothDevice>();
         }
 

@@ -22,7 +22,6 @@ namespace loveTalk
         public BluetoothDevice btDevice;
         public GattService btSevice;
         public string Model = "UNKNOWN";
-        public string AdvancedStatus = "Not a damn thing";
         public loveToyStatus Status;
         public loveToyController Controller;
 
@@ -37,6 +36,7 @@ namespace loveTalk
             "50300001-0024-4bd4-bbd5-a6920e4c5653", // V3
             "57300001-0023-4bd4-bbd5-a6920e4c5653", // V4
             "5a300001-0023-4bd4-bbd5-a6920e4c5653", // V5 firmware
+            "42300001-0023-4bd4-bbd5-a6920e4c5653"
         };
         private string[] rxCharacteristics = new string[]
         {
@@ -45,6 +45,7 @@ namespace loveTalk
             "50300003-0024-4bd4-bbd5-a6920e4c5653", // V3 toy
             "57300003-0023-4bd4-bbd5-a6920e4c5653", // V4 toy
             "5a300003-0023-4bd4-bbd5-a6920e4c5653", // V5 firmware
+            "42300003-0023-4bd4-bbd5-a6920e4c5653"
 
         };
 
@@ -55,8 +56,9 @@ namespace loveTalk
             "50300002-0024-4bd4-bbd5-a6920e4c5653", // V3 toy 
             "57300002-0023-4bd4-bbd5-a6920e4c5653", // V4 toy
             "5a300002-0023-4bd4-bbd5-a6920e4c5653", // V5 firmware
+            "42300002-0023-4bd4-bbd5-a6920e4c5653",
         };
-
+         
 
         public loveToy(BluetoothDevice dev)
         {
@@ -90,7 +92,7 @@ namespace loveTalk
 
         public async Task<bool> connect()
         {
-            AdvancedStatus = "Connecting to GATT";
+            Debug.WriteLine("Connecting to GATT");
             await btDevice.Gatt.ConnectAsync();
             for (int i=0; i < rxCharacteristics.Length; i++) {
                 var service = serviceUID[i];
@@ -98,6 +100,7 @@ namespace loveTalk
                 var txChar = txCharacteristics[i];
                 try
                 {
+                    
                     Debug.WriteLine("Connecting to service");
                     btSevice = await btDevice.Gatt.GetPrimaryServiceAsync(BluetoothUuid.FromGuid(new Guid(service)));
                     if (btSevice == null)
@@ -117,12 +120,12 @@ namespace loveTalk
             }
             if (btSevice == null || btRxChr == null || btTxChr == null)
             {
-                Debug.WriteLine("something null");
+                Debug.WriteLine("Service or characteristic was null!");
                 return false;
             }
             var devInfo = sendCommand("DeviceType;").Result;
             Model = lookupToyName(devInfo[0]);
-            Console.WriteLine(Model);
+            Debug.WriteLine($"Toy type connected . . . {Model}");
             return true;
         }
 
@@ -130,7 +133,7 @@ namespace loveTalk
 
         public void sendCommandNoResponse(string command)
         {
-            Console.WriteLine(command);
+            Debug.WriteLine($"sendCommandNR -> {command}");
             var packet = Encoding.ASCII.GetBytes(command);
             btTxChr.WriteValueWithoutResponseAsync(packet);
         }
@@ -140,6 +143,7 @@ namespace loveTalk
             var packet = Encoding.ASCII.GetBytes(command);
             await btRxChr.StartNotificationsAsync(); // Subscribe to BTCHAR notifications
             await btTxChr.WriteValueWithResponseAsync(packet);
+            Debug.WriteLine($"sendCommand -> {command}");
             // xayrga.bop.lengthEncapsulateArray(packet)
             return Encoding.ASCII.GetString(btRxChr.Value);
         }
@@ -165,13 +169,41 @@ namespace loveTalk
         }
 
         private int airDebounce = 0;
-        public void setAirLevel(float value)
+        public void setAirLevelPattern(float value)
         {
             var normalized = (int)Math.Floor(Math.Min(5, Math.Max(0, value * 5)));
             if (normalized == airDebounce)
                 return;
             sendCommandNoResponse($"Air:Level:{normalized};");
             airDebounce = normalized;
+        }
+
+
+        private int airStaticDebounce = 0;
+        private int airLastRelativeValue = 0; 
+        public async void setAirLevelAbsolute(float value)
+        {
+            var normalized = (int)Math.Floor(Math.Min(8, Math.Max(0, value * 8)));
+
+            var delta = normalized - airLastRelativeValue;
+            var newValue = Math.Min(8, Math.Max(0, airLastRelativeValue + delta));
+            
+            if (newValue == airStaticDebounce)
+                return;
+
+            for (int i = 0; i < Math.Abs(delta); i++)
+            {
+                if (delta > 0)
+                {
+                    sendCommandNoResponse($"Air:In:1;");
+                }
+                else if (delta < 0)
+                {
+                    sendCommandNoResponse($"Air:Out:1;");
+                }
+                await Task.Delay(100);
+            }
+            airStaticDebounce = normalized;
         }
     }
 }
