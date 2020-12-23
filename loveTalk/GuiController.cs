@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-
 using ImGuiNET;
 using Veldrid;
 using Veldrid.Sdl2;
@@ -68,7 +66,7 @@ namespace loveTalk
         private static async void btw_rescanDevices()
         {
             btw_Scanning = true;
-            devices = await BTManager.getDevices();
+            devices = await BluetoothManager.getDevices();
             btw_Scanning = false;
         }
 
@@ -77,16 +75,18 @@ namespace loveTalk
             var w = new loveToy(dev);
             if (!await w.connect())
                 return;
-            for (int i=0; i < Program.Toys.Length; i++)
-                if (Program.Toys[i]==null)
+            for (int i=0; i < rootInit.Toys.Length; i++)
+                if (rootInit.Toys[i]==null)
                 {
-                    Program.Toys[i] = w;
+                    rootInit.Toys[i] = w;
                     return;
                 }
             Console.WriteLine("No free toy slots.");
-            throw new Program.CallYourTherapistException();
+            throw new rootInit.CallYourTherapistException();
 
         }
+
+       
 
         public static void renderElements()
         {
@@ -108,14 +108,16 @@ namespace loveTalk
             ImGui.SetNextWindowPos(new Vector2(340, 0));
             ImGui.SetNextWindowSize(new Vector2(200, 200));
             ImGui.Begin("VRC Collider Detection");
-            for (int i=0; i < Program.Toys.Length; i++)
+            for (int i=0; i < rootInit.Toys.Length; i++)
             {
-                var toyt = Program.Toys[i];
+                var toyt = rootInit.Toys[i];
                 if (toyt != null)
                     if (ImGui.Button(toyt.Model + " " + toyt.btDevice.Id))
                         currentEditToy = toyt;
             }
             ImGui.End();
+
+           
 
             ImGui.SetNextWindowPos(new Vector2(0, 200));
             ImGui.SetNextWindowSize(new Vector2(540, 400));
@@ -124,9 +126,9 @@ namespace loveTalk
             {
                 ImGui.Text($"Current Controller {(currentEditToy.Controller == null ? "NOTHING" : currentEditToy.Controller.Name)}");
                 var item = 0;
-                var items = Program.controllers.Keys.ToArray<string>();
+                var items = rootInit.controllers.Keys.ToArray<string>();
                 if (ImGui.Combo("Set new controller", ref item, items, items.Length))
-                    currentEditToy.Controller = Program.controllers[items[item]].copy();
+                    currentEditToy.Controller = rootInit.controllers[items[item]].copy();
                 if (currentEditToy.Controller!=null)
                 {
                     for (int bi = 0; bi < currentEditToy.Controller.Callbacks.Count; bi++)
@@ -136,17 +138,19 @@ namespace loveTalk
                         ImGui.Text(hnd.Name);
                         ImGui.Text($"A {(param.a == null ? "NOTHING" : param.a.name)}");
 
+                       
                         item = 0;
-                        items = new string[Program.colliders.Length];
+                        items = new string[rootInit.colliders.Length];
                         for (int q = 0; q < items.Length; q++)
-                            items[q] = Program.colliders[q].name;
+                            items[q] = rootInit.colliders[q].name;
+                        
                         if (ImGui.Combo("Set new collider A##" + bi, ref item, items, items.Length))
-                            param.a = ColliderCon.matchName(Program.colliders,items[item]);
+                            param.a = ColliderCon.matchName(rootInit.colliders,items[item]);
 
                         ImGui.Text($"B {(param.b == null ? "NOTHING" : param.b.name)}");
                         item = 0;
                         if (ImGui.Combo("Set new collider B##" + bi, ref item, items, items.Length))
-                            param.b = ColliderCon.matchName(Program.colliders, items[item]);
+                            param.b = ColliderCon.matchName(rootInit.colliders, items[item]);
                         if (ImGui.Button("Any##" + bi))
                             param.b = new ColliderData() { any = true, name = "ANY" };
 

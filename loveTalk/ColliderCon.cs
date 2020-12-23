@@ -61,6 +61,17 @@ namespace loveTalk
                     return coll[i];
             return null;            
         }
+
+        public static int matchNameIndex(ColliderData[] coll, string name)
+        {
+            for (int i = 0; i < coll.Length; i++)
+                if (coll[i].name == name)
+                {
+
+                    return i;
+                }
+            return 0;
+        }
     }
 
     public class ColliderData

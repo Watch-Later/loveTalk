@@ -11,7 +11,7 @@ using NLua;
 
 namespace loveTalk
 {
-    class Program
+    class rootInit
     {
         public static Lua LuaState;
         public static LuaFunction callHook;

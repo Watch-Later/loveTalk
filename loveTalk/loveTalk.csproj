@@ -66,20 +66,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BTManager.cs" />
+    <Compile Include="BluetoothManager.cs" />
     <Compile Include="ColliderCon.cs" />
     <Compile Include="GuiController.cs" />
     <Compile Include="ImGuiController.cs" />
     <Compile Include="loveToy.cs" />
     <Compile Include="loveToyController.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="rootInit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="lovetalk\controllers\test.lua">
+    <None Include="lovetalk\controllers\hush.lua">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="lovetalk\controllers\max.lua" />
     <None Include="lovetalk\init.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

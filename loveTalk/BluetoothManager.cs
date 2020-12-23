@@ -12,7 +12,7 @@ namespace loveTalk
 {
 
     // 5a300001-0023-4bd4-bbd5-a6920e4c5653
-    public static class BTManager
+    public static class BluetoothManager
     {
         public static BluetoothDevice[] pairedDevices;
         public static async Task<BluetoothDevice[]> getDevices()
